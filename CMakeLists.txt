@@ -4,15 +4,29 @@ project(small VERSION 0.1.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-set(OPENVINO_INCLUDE_DIR "" CACHE PATH "Path to OpenVINO include directory")
-
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # Dependencies
 find_package(OpenCV REQUIRED COMPONENTS core highgui videoio imgproc imgcodecs)
 find_package(OpenVINO REQUIRED COMPONENTS Runtime)
 
+find_path(OPENVINO_INCLUDE_DIR 
+  NAMES "openvino.hpp"
+  PATHS 
+    "/opt/homebrew/include/"
+    "/usr/local/include/"
+    "C:/Program Files (x86)/Intel/openvino_2023.3/deployment_tools/inference_engine/include"
+  PATH_SUFFIXES openvino
+)
+cmake_path(GET OPENVINO_INCLUDE_DIR PARENT_PATH OPENVINO_INCLUDE_DIR)
+
+if (NOT OPENVINO_INCLUDE_DIR)
+  message(FATAL_ERROR "OpenVINO not found")
+else()
+  message(STATUS "OpenVINO headers found at ${OPENVINO_INCLUDE_DIR}")
+endif()
+
+# nlohmann::json
 include(FetchContent)
 set(FETCHCONTENT_QUIET OFF)
 set(BUILD_TESTING OFF CACHE INTERNAL "")
@@ -23,7 +37,7 @@ FetchContent_Declare(json
   GIT_SHALLOW    TRUE
 )
 FetchContent_MakeAvailable(json)
-include_directories(${json_SOURCE_DIR}/include)
+
 
 # Static library with common source files
 set(COMMON ${SOURCE_DIR}/common)
@@ -60,6 +74,7 @@ include_directories(
   ${COMMON}/pipelines/include
   ${COMMON}/utils/include
   ${OPENVINO_INCLUDE_DIR}
+  ${json_SOURCE_DIR}/include
 )
 
 add_library(common STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})

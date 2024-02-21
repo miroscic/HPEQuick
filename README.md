@@ -17,7 +17,7 @@ On Windows, follw the instructions on the OpenVINO documentation to install the 
 Then, build the project using CMake:
 
 ```bash
-cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DOPENVINO_INCLUDE_DIR=<path to openvino headers>
+cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
 ```
 
 ## How to Run
