@@ -253,10 +253,15 @@ private:
 
 int main(int argc, char *argv[]) {
   try {
+    int cam_id = 0;
     if (argc < 2) {
-      throw std::invalid_argument("Usage: " + string(argv[0]) + " <model.xml>");
+      throw std::invalid_argument("Usage: " + string(argv[0]) +
+                                  " <model.xml> [cam_id]");
     }
-    HPEQuick hpe(0, argv[1]);
+    if (argc == 3) {
+      cam_id = stoi(argv[2]);
+    }
+    HPEQuick hpe(cam_id, argv[1]);
     std::vector<HumanPose> poses;
 
     while (hpe.process_frame()) {
