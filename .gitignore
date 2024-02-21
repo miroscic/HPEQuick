@@ -23,5 +23,6 @@ TestResults.xml
 
 *.xml
 *.bin
+*.jpg
 
 build/*

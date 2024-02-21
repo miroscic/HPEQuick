@@ -1,15 +1,13 @@
 /*
-  _   _ ____  _____ ___        _      _    
+  _   _ ____  _____ ___        _      _
  | | | |  _ \| ____/ _ \ _   _(_) ___| | __
  | |_| | |_) |  _|| | | | | | | |/ __| |/ /
- |  _  |  __/| |__| |_| | |_| | | (__|   < 
+ |  _  |  __/| |__| |_| | |_| | | (__|   <
  |_| |_|_|   |_____\__\_\\__,_|_|\___|_|\_\
-                                           
+
 Quick demo of human pose estimation using OpenVINO
 Author: Paolo Bosetti
 */
-
-
 
 #include <chrono>
 
@@ -21,11 +19,20 @@ Author: Paolo Bosetti
 
 #include <models/hpe_model_openpose.h>
 #include <models/input_data.h>
+#include <nlohmann/json.hpp>
 #include <pipelines/async_pipeline.h>
 #include <pipelines/metadata.h>
 #include <utils/common.hpp>
 
 using namespace std;
+using json = nlohmann::json;
+
+map<int, string> keypoints_map = {
+    {0, "Nose"},   {1, "Neck"},      {2, "RShoulder"}, {3, "RElbow"},
+    {4, "RWrist"}, {5, "LShoulder"}, {6, "LElbow"},    {7, "LWrist"},
+    {8, "RHip"},   {9, "RKnee"},     {10, "RAnkle"},   {11, "LHip"},
+    {12, "LKnee"}, {13, "LAnkle"},   {14, "REye"},     {15, "LEye"},
+    {16, "REar"},  {17, "LEar"}};
 
 class HPEQuick {
 
@@ -192,12 +199,12 @@ public:
     _pipeline->waitForData();
 
     // Deal with results
-    if (!(_result = _pipeline->getResult())) {
+    if (!(result = _pipeline->getResult())) {
       return false;
     }
     if (!no_show) {
       _out_frame =
-          renderHumanPose(_result->asRef<HumanPoseResult>(), _output_transform);
+          renderHumanPose(result->asRef<HumanPoseResult>(), _output_transform);
       cv::imshow("Human Pose Estimation Results", _out_frame);
       int key = cv::waitKey(1000.0 / fps);
       if (27 == key || 'q' == key || 'Q' == key) { // Esc
@@ -208,6 +215,8 @@ public:
 
     return true;
   }
+
+  void save_last_frame(string filename) { cv::imwrite(filename, _out_frame); }
 
   uint32_t tsize = 0;         // target size
   double threshold = 0.1;     // probability threshold
@@ -221,9 +230,9 @@ public:
   uint32_t frames_processed = 0;
   int64_t frame_num = 0;
   double fps = 25;
+  unique_ptr<ResultBase> result;
 
 private:
-  unique_ptr<ResultBase> _result;
   cv::VideoCapture _cap;
   chrono::steady_clock::time_point _start_time;
   cv::Mat _curr_frame, _out_frame;
@@ -248,14 +257,28 @@ int main(int argc, char *argv[]) {
       throw std::invalid_argument("Usage: " + string(argv[0]) + " <model.xml>");
     }
     HPEQuick hpe(0, argv[1]);
+    std::vector<HumanPose> poses;
 
     while (hpe.process_frame()) {
+      poses = hpe.result->asRef<HumanPoseResult>().poses;
       cout << "\r\x1b[0KAcuired: " << hpe.frame_num << ", processed "
-          << hpe.frames_processed << " frames";
+           << hpe.frames_processed << " frames; poses: " << poses.size();
       cout.flush();
     }
-
     cout << endl;
+    // Last known pose
+    hpe.save_last_frame("last_frame.jpg");
+    json data;
+    for (int i = 0; i < poses.size(); i++) {
+      for (int kp = 0; kp < poses[i].keypoints.size(); kp++) {
+        auto &keypoint = poses[i].keypoints[kp];
+        if (keypoint.x < 0 || keypoint.y < 0)
+          continue;
+        data["poses"][i][keypoints_map[kp]] = {keypoint.x, keypoint.y};
+      }
+    }
+    cout << data.dump(2) << endl;
+
   } catch (const std::exception &error) {
     cerr << error.what() << endl;
     return 1;
