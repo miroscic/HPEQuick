@@ -21,10 +21,10 @@ cmake -Bbuild
 cmake --build build
 ```
 
-On Windows:
+On Windows (with typical setup dirs for OpenVINO and OpenCV):
 
 ```bash
-cmake -Bbuild
+cmake -Bbuild -DOpenCV_DIR=C:\OpenCV\build -DOpenVINO_DIR="C:\Program Files (x86)\Intel\openvino_2023.3\runtime\cmake" 
 cmake --build build --config Release
 ```
 

@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(small VERSION 0.1.1 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -23,7 +23,7 @@ find_path(OPENVINO_INCLUDE_DIR
   PATHS 
     "/opt/homebrew/include/"
     "/usr/local/include/"
-    "C:/Program Files (x86)/Intel/openvino_2023.3/deployment_tools/inference_engine/include"
+    "C:/Program Files (x86)/Intel/openvino_2023.3/runtime/include"
   PATH_SUFFIXES openvino
 )
 cmake_path(GET OPENVINO_INCLUDE_DIR PARENT_PATH OPENVINO_INCLUDE_DIR)

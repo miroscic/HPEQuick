@@ -6,11 +6,13 @@
 
 #include <algorithm>
 #ifdef _WIN32
+#define NOMINMAX
 #include "query_wrapper.h"
 #include <string>
 #include <system_error>
 #include <PdhMsg.h>
 #include <Windows.h>
+#include <cstddef>
 
 namespace {
 const std::size_t nCores = []() {
