@@ -10,9 +10,9 @@ Quick example of Human Pose Estimation using OpenVINO and an OpenPose model
 
 First, install the requirements. On Unixes, `brew` or `apt` can be used to install OpenVINO.
 
-OpenCV is better installed from source. Follow the instructions on the OpenCV documentation to install it: <https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html>
+**On MacOS**, OpenCV is better installed from source. Follow the instructions on the OpenCV documentation to install it: <https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html>
 
-On Windows, follw the instructions on the OpenVINO documentation to install the toolkit: <https://docs.openvino.ai/2023.3/openvino_docs_install_guides_overview.html>
+**On Linux**, `apt install libopencv-dev` is fine.
 
 Then, build the project using CMake (by default, the project is built in `Release` configuration):
 
@@ -21,7 +21,11 @@ cmake -Bbuild
 cmake --build build
 ```
 
-On Windows (with typical setup dirs for OpenVINO and OpenCV):
+**On Windows**, follw the instructions on the OpenVINO documentation to install the toolkit: <https://docs.openvino.ai/2023.3/openvino_docs_install_guides_overview.html>. Likewise, for OpenCV follow instrictions on <https://docs.opencv.org/4.x/d3/d52/tutorial_windows_install.html>.
+
+With typical setup dirs for OpenVINO and OpenCV, remember to add to the `PATH` environment variable the dll directories, typically: `C:\OpenCV\build\x64\vc16\bin`, `C:\Program Files (x86)\Intel\openvino_2023.3\runtime\bin\intel64\Release`, and `C:\Program Files (x86)\Intel\openvino_2023.3\runtime\3rdparty\tbb\bin`, assuming that you installed OpenCV on `C:\OpenCV` and OpenVINO under `C:\Program Files (x86)\Intel\openvino_2023.3`. 
+
+Finally, configure the project and build it as follows:
 
 ```bash
 cmake -Bbuild -DOpenCV_DIR=C:\OpenCV\build -DOpenVINO_DIR="C:\Program Files (x86)\Intel\openvino_2023.3\runtime\cmake" 
