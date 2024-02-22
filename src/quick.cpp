@@ -27,12 +27,15 @@ Author: Paolo Bosetti
 using namespace std;
 using json = nlohmann::json;
 
+// Map of OpenPOSE keypoint names
+// TODO: update with Miroscic names
 map<int, string> keypoints_map = {
     {0, "Nose"},   {1, "Neck"},      {2, "RShoulder"}, {3, "RElbow"},
     {4, "RWrist"}, {5, "LShoulder"}, {6, "LElbow"},    {7, "LWrist"},
     {8, "RHip"},   {9, "RKnee"},     {10, "RAnkle"},   {11, "LHip"},
     {12, "LKnee"}, {13, "LAnkle"},   {14, "REye"},     {15, "LEye"},
     {16, "REar"},  {17, "LEar"}};
+
 
 class HPEQuick {
 
@@ -140,10 +143,12 @@ class HPEQuick {
 
 public:
   // Constructor
-  HPEQuick(int device, string model) : _output_transform() {
+  HPEQuick(int device, string model) : _output_transform(), _device(device), _model_file(model) {}
+
+  void init() {
     _start_time = chrono::steady_clock::now();
     // setup video capture
-    _cap.open(device);
+    _cap.open(_device);
     if (!_cap.isOpened()) {
       throw std::invalid_argument("Cannot open the video camera");
     }
@@ -156,11 +161,12 @@ public:
       _output_transform = OutputTransform(_curr_frame.size(), resolution);
       resolution = _output_transform.computeResolution();
     }
+    cout << "Resolution: " << resolution << endl;
 
     // setup inference model
     double aspect_ratio =
         _curr_frame.cols / static_cast<double>(_curr_frame.rows);
-    _model.reset(new HPEOpenPose(model, aspect_ratio, tsize,
+    _model.reset(new HPEOpenPose(_model_file, aspect_ratio, tsize,
                                  static_cast<float>(threshold), layout));
     // setup pipeline
     _pipeline = new AsyncPipeline(
@@ -181,7 +187,7 @@ public:
   bool process_frame() {
     // Submit data to the pipeline
     if (_pipeline->isReadyToProcess()) {
-      //--- Capturing frame
+      // Capturing frame
       _start_time = std::chrono::steady_clock::now();
       _cap >> _curr_frame;
       if (_curr_frame.empty()) {
@@ -193,9 +199,8 @@ public:
           std::make_shared<ImageMetaData>(_curr_frame, _start_time));
     }
 
-    //--- Waiting for free input slot or output data available. Function will
-    // return immediately if any of them
-    // are available.
+    // Waiting for free input slot or output data available. Function will
+    // return immediately if any of them are available.
     _pipeline->waitForData();
 
     // Deal with results
@@ -233,6 +238,8 @@ public:
   unique_ptr<ResultBase> result;
 
 private:
+  int _device;
+  string _model_file;
   cv::VideoCapture _cap;
   chrono::steady_clock::time_point _start_time;
   cv::Mat _curr_frame, _out_frame;
@@ -262,6 +269,8 @@ int main(int argc, char *argv[]) {
       cam_id = stoi(argv[2]);
     }
     HPEQuick hpe(cam_id, argv[1]);
+    hpe.out_res = "800x450";
+    hpe.init();
     std::vector<HumanPose> poses;
 
     while (hpe.process_frame()) {
