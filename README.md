@@ -14,23 +14,31 @@ OpenCV is better installed from source. Follow the instructions on the OpenCV do
 
 On Windows, follw the instructions on the OpenVINO documentation to install the toolkit: <https://docs.openvino.ai/2023.3/openvino_docs_install_guides_overview.html>
 
-Then, build the project using CMake:
+Then, build the project using CMake (by default, the project is built in `Release` configuration):
 
 ```bash
-cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
+cmake -Bbuild
+cmake --build build
 ```
+
+On Windows:
+
+```bash
+cmake -Bbuild
+cmake --build build --config Release
+```
+
 
 ## How to Run
 
-The program takes a single argument, which is the path to the OpenPOSE model to use for inference. The model can be downloaded from the OpenVINO model zoo with the following command:
-
-```bash
-wget https://storage.openvinotoolkit.org/repositories/open_model_zoo/2023.0/models_bin/1/human-pose-estimation-0001/FP32/human-pose-estimation-0001.xml
-wget https://storage.openvinotoolkit.org/repositories/open_model_zoo/2023.0/models_bin/1/human-pose-estimation-0001/FP32/human-pose-estimation-0001.bin
-```
-
-Then, run the program:
+The program takes a single argument, which is the path to the OpenPOSE model to use for inference. The model is automatically downloaded by CMake in the `models` directory. Tu run the program, use the following command:
 
 ```bash
 build/quick human-pose-estimation-0001.xml
+```
+
+If you have more than one camera, you can specify the camera index as a second argument:
+
+```bash
+build/quick human-pose-estimation-0001.xml 1
 ```
