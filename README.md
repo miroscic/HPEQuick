@@ -23,12 +23,19 @@ cmake --build build
 
 **On Windows**, follw the instructions on the OpenVINO documentation to install the toolkit: <https://docs.openvino.ai/2023.3/openvino_docs_install_guides_overview.html>. Likewise, for OpenCV follow instrictions on <https://docs.opencv.org/4.x/d3/d52/tutorial_windows_install.html>.
 
-With typical setup dirs for OpenVINO and OpenCV, remember to add to the `PATH` environment variable the dll directories, typically: `C:\OpenCV\build\x64\vc16\bin`, `C:\Program Files (x86)\Intel\openvino_2023.3\runtime\bin\intel64\Release`, and `C:\Program Files (x86)\Intel\openvino_2023.3\runtime\3rdparty\tbb\bin`, assuming that you installed OpenCV on `C:\OpenCV` and OpenVINO under `C:\Program Files (x86)\Intel\openvino_2023.3`. 
+With typical setup dirs for OpenVINO and OpenCV, remember to add to the `PATH` environment variable the dll directories, typically: `C:\OpenCV\build\x64\vc16\bin`, `C:\Program Files (x86)\Intel\openvino_2023.3\runtime\bin\intel64\Release`, and `C:\Program Files (x86)\Intel\openvino_2023.3\runtime\3rdparty\tbb\bin`, assuming that you installed OpenCV on `C:\OpenCV` and OpenVINO under `C:\Program Files (x86)\Intel\openvino_2023.3`.
+
+Then, create the following environment variables to the paths of the respective installation dirs (once and for good):
+
+```powershell
+setx OpenCV_DIR C:\OpenCV
+setx OpenVINO_DIR 'C:\Program Files (x86)\Intel\openvino_2023.3'
+```
 
 Finally, configure the project and build it as follows:
 
-```bash
-cmake -Bbuild -DOpenCV_DIR=C:\OpenCV\build -DOpenVINO_DIR="C:\Program Files (x86)\Intel\openvino_2023.3\runtime\cmake" 
+```powershell
+cmake -Bbuild 
 cmake --build build --config Release
 ```
 

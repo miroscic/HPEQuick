@@ -15,24 +15,37 @@ set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
 
 
 # Dependencies #################################################################
+if(WIN32)
+  # On Windows, we rely on env variables to find install paths
+  if(NOT DEFINED ENV{OpenCV_DIR})
+    message(FATAL_ERROR "OpenCV_DIR env var not set, please set it to the OpenCV install directory")
+  endif()
+  set(OpenCV_DIR "$ENV{OpenCV_DIR}\\build" CACHE PATH "OpenCV build directory" FORCE)
+  if(NOT DEFINED ENV{OpenVINO_DIR})
+    message(FATAL_ERROR "OpenVINO_DIR env var not set, please set it to the OpenVINO install directory")
+  endif()
+  set(OpenVINO_DIR "$ENV{OpenVINO_DIR}\\runtime\\cmake" CACHE PATH "OpenVINO install directory" FORCE)
+endif()
+
 find_package(OpenCV REQUIRED COMPONENTS core highgui videoio imgproc imgcodecs)
 find_package(OpenVINO REQUIRED COMPONENTS Runtime)
 
-find_path(OPENVINO_INCLUDE_DIR 
-  NAMES "openvino.hpp"
-  PATHS 
-    "/opt/homebrew/include/"
-    "/usr/local/include/"
-    "C:/Program Files (x86)/Intel/openvino_2023.3/runtime/include"
-  PATH_SUFFIXES openvino
-)
-cmake_path(GET OPENVINO_INCLUDE_DIR PARENT_PATH OPENVINO_INCLUDE_DIR)
-
+if(WIN32)
+  # OpenVINO headers have to be manually found on Windows
+  set(OPENVINO_INCLUDE_DIR "$ENV{OpenVINO_DIR}\\runtime\\include")
+else()
+  find_path(OPENVINO_INCLUDE_DIR NAMES openvino.hpp 
+    PATHS /opt/homebrew/include /usr/local/include
+    PATH_SUFFIXES openvino
+  )
+  cmake_path(GET OPENVINO_INCLUDE_DIR PARENT_PATH OPENVINO_INCLUDE_DIR)
+endif()
 if (NOT OPENVINO_INCLUDE_DIR)
   message(FATAL_ERROR "OpenVINO not found")
 else()
   message(STATUS "OpenVINO headers found at ${OPENVINO_INCLUDE_DIR}")
 endif()
+
 
 # nlohmann::json
 include(FetchContent)
@@ -48,6 +61,8 @@ FetchContent_MakeAvailable(json)
 
 # Compiler options #############################################################
 if(MSVC)
+  add_compile_options(/wd4267)
+  add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 else()
   add_compile_options(-Wno-deprecated-anon-enum-enum-conversion)
 endif()
