@@ -46,8 +46,14 @@ FetchContent_Declare(json
 )
 FetchContent_MakeAvailable(json)
 
+# Compiler options #############################################################
+if(MSVC)
+else()
+  add_compile_options(-Wno-deprecated-anon-enum-enum-conversion)
+endif()
 
-# Static library with common source files ######################################
+
+# OMZ common source files ######################################################
 set(COMMON ${SOURCE_DIR}/common)
 
 file(GLOB COMMON_SOURCES
@@ -56,14 +62,12 @@ file(GLOB COMMON_SOURCES
   ${COMMON}/pipelines/src/*.cpp
   ${COMMON}/utils/src/*.cpp
 )
-
 file(GLOB COMMON_HEADERS
   ${COMMON}/models/include/models/*.h
   ${COMMON}/monitors/include/monitors/*.h
   ${COMMON}/pipelines/include/pipelines/*.h
   ${COMMON}/utils/include/utils/*.h*
 )
-
 # Remove items that depend on gflags (which we don't want)
 list(REMOVE_ITEM COMMON_SOURCES ${COMMON}/monitors/src/query_wrapper.cpp)
 list(REMOVE_ITEM COMMON_HEADERS ${COMMON}/monitors/src/query_wrapper.h)
