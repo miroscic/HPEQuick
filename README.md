@@ -23,7 +23,7 @@ cmake --build build
 
 **On Windows**, The project is tested on **Visual Studio 2022**.
 
-Follow the instructions on the OpenVINO documentation to install the toolkit: <https://docs.openvino.ai/2023.3/openvino_docs_install_guides_overview.html>. Likewise, for OpenCV follow instrictions on <https://docs.opencv.org/4.x/d3/d52/tutorial_windows_install.html>.
+Follow the instructions on the OpenVINO documentation to install the toolkit: <https://docs.openvino.ai/2023.3/openvino_docs_install_guides_overview.html>. Likewise, for OpenCV follow instructions on <https://docs.opencv.org/4.x/d3/d52/tutorial_windows_install.html>.
 
 With OpenVINO extracted to `C:\Program Files (x86)\Intel\openvino_2023.3` and OpenCV to `C:\OpenCV`, remember to add to the `PATH` environment variable the dll directories, typically: `C:\OpenCV\build\x64\vc16\bin`, `C:\Program Files (x86)\Intel\openvino_2023.3\runtime\bin\intel64\Release`, and `C:\Program Files (x86)\Intel\openvino_2023.3\runtime\3rdparty\tbb\bin`.
 
