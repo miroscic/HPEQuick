@@ -199,6 +199,8 @@ std::unique_ptr<ResultBase> HPEOpenPose::postprocess(InferenceResult& infResult)
     for (size_t i = 0; i < poses.size(); ++i) {
         result->poses.push_back(poses[i]);
     }
+    result->heatMaps = heatMaps;
+    result->pafs = pafs;
 
     return std::unique_ptr<ResultBase>(result);
 }
